@@ -20,6 +20,15 @@ $sql = "
 $stmt = $pdo->query($sql);
 $summary = $stmt->fetch();
 
+if (!$summary) {
+    $summary = [
+        'total_districts' => 0,
+        'avg_fully_excluded_rate' => 0,
+        'avg_mobile_money_rate' => 0,
+        'severely_underserved_count' => 0
+    ];
+}
+
 $sqlWorst = "
     SELECT name, mismatch_gap
     FROM   districts
@@ -29,14 +38,14 @@ $sqlWorst = "
 $stmtWorst = $pdo->query($sqlWorst);
 $worst = $stmtWorst->fetch();
 
-$summary['worst_district'] = $worst;
+$summary['worst_district'] = $worst ?: ['name' => 'N/A', 'mismatch_gap' => 0];
 
 // Cast to numbers where appropriate for JSON
-$summary['total_districts'] = (int) $summary['total_districts'];
-$summary['avg_fully_excluded_rate'] = (float) $summary['avg_fully_excluded_rate'];
-$summary['avg_mobile_money_rate'] = (float) $summary['avg_mobile_money_rate'];
-$summary['severely_underserved_count'] = (int) $summary['severely_underserved_count'];
-$summary['worst_district']['mismatch_gap'] = (float) $summary['worst_district']['mismatch_gap'];
+$summary['total_districts'] = (int) ($summary['total_districts'] ?? 0);
+$summary['avg_fully_excluded_rate'] = (float) ($summary['avg_fully_excluded_rate'] ?? 0);
+$summary['avg_mobile_money_rate'] = (float) ($summary['avg_mobile_money_rate'] ?? 0);
+$summary['severely_underserved_count'] = (int) ($summary['severely_underserved_count'] ?? 0);
+$summary['worst_district']['mismatch_gap'] = (float) ($summary['worst_district']['mismatch_gap'] ?? 0);
 
 echo json_encode([
     'success' => true,
