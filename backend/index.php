@@ -41,6 +41,11 @@ switch (true) {
         require_once __DIR__ . '/api/simulate.php';
         break;
 
+    // GET /model
+    case $route === 'model' && $method === 'GET':
+        require_once __DIR__ . '/api/model.php';
+        break;
+
     // Root health check
     case $route === '' || $route === 'api':
         echo json_encode([
@@ -50,6 +55,7 @@ switch (true) {
                 'GET  /api/districts',
                 'GET  /api/districts/{id}',
                 'GET  /api/national-summary',
+                'GET  /api/model',
                 'POST /api/simulate',
             ]
         ]);

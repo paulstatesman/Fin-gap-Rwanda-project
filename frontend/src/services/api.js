@@ -24,4 +24,7 @@ export const fetchDistrict = (id) =>
 export const runSimulation = (payload) =>
   api.post('/api/simulate', payload).then(r => r.data);
 
+export const fetchModel = () =>
+  api.get('/api/model').then(r => r.data.data);
+
 export default api;

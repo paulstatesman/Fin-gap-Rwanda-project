@@ -10,9 +10,14 @@
 //   "agent_boost": 15,       (% increase in agent network density)
 //   "literacy_boost": 10     (% increase in financial literacy)
 // }
+//
+// The sensitivity coefficients are FITTED from the live district
+// dataset (see ../model.php) rather than hard-coded, so the
+// projections move with the underlying data.
 // ============================================================
 require_once __DIR__ . '/../cors.php';
 require_once __DIR__ . '/../config/database.php';
+require_once __DIR__ . '/../model.php';
 
 $pdo = getDBConnection();
 
@@ -49,36 +54,62 @@ if (!$district) {
 }
 
 // ============================================================
-// SIMULATION MODEL (Based on Hackathon requirements)
-// Weighted impact of interventions on Exclusion Risk
+// SENSITIVITY MODEL
+// Fit fully_excluded_rate ~ mobile_money_rate + banked_rate +
+// primary_edu_or_less across all districts, then read the
+// coefficients as the marginal effect of each intervention.
 // ============================================================
+$model = null;
+try {
+    $model = buildExclusionModel($pdo);
+} catch (Throwable $e) {
+    error_log('Simulation model fit failed: ' . $e->getMessage());
+}
 
-// Coefficients determined by EICV7 correlation analysis
-$weightPhone    = 0.45; // 45% impact from mobile ownership
-$weightAgent    = 0.35; // 35% impact from agent proximity
-$weightLiteracy = 0.20; // 20% impact from financial literacy
+$coefficients = $model['intervention_model']['coefficients'] ?? null;
+$method       = $model['intervention_model']['method'] ?? null;
 
-// Calculate total reduction in the exclusion risk score
-$totalRiskReduction = ($phoneBoost * $weightPhone) +
-                      ($agentBoost * $weightAgent) +
-                      ($literacyBoost * $weightLiteracy);
+$modelApplied = is_array($coefficients)
+    && count($coefficients) === 3
+    && ($coefficients[0] != 0.0 || $coefficients[1] != 0.0 || $coefficients[2] != 0.0);
 
-// Apply reduction (floor at 5.0 base structural risk)
-$simulatedRiskScore = max(5.0,  round($district['exclusion_risk_score'] - $totalRiskReduction, 2));
+if ($modelApplied) {
+    [$cMobile, $cBanked, $cEducation] = array_map('floatval', $coefficients);
 
-// Estimate new fully excluded rate
-// A drop in risk score doesn't perfectly equal a 1:1 drop in exclusion,
-// applying a conservative 0.4 dampening factor.
-$simulatedExcludedRate = max(2.0,  round($district['fully_excluded_rate'] - ($totalRiskReduction * 0.40), 2));
+    // Boosts raise access indicators and reduce the low-education share.
+    $exclusionDelta = ($cMobile * $phoneBoost)
+                    + ($cBanked * $agentBoost)
+                    + ($cEducation * (-$literacyBoost));
+} else {
+    // Prototype fallback used only if the regression cannot be fitted.
+    $totalRiskReduction = ($phoneBoost * 0.45) + ($agentBoost * 0.35) + ($literacyBoost * 0.20);
+    $exclusionDelta = -1 * ($totalRiskReduction * 0.40);
+    $method = 'prototype_fallback';
+}
 
-// Recalculate the mismatch gap based on the original formula
-// (Simulated Excluded Rate) - (Poverty Rate * 0.45)
-$simulatedMismatchGap = round($simulatedExcludedRate - ($district['poverty_rate'] * 0.45), 2);
+$simulatedExcludedRate = round(max(0.5, min(100.0, (float) $district['fully_excluded_rate'] + $exclusionDelta)), 2);
+$exclusionReduction    = round((float) $district['fully_excluded_rate'] - $simulatedExcludedRate, 2);
 
-// Calculate real human impact
-// Average district population in Rwanda ~ 200,000 adults
-$avgDistrictPop = 200000;
-$exclusionReduction = round($district['fully_excluded_rate'] - $simulatedExcludedRate, 2);
+// Move the risk score in proportion to the exclusion reduction.
+$baselineExcluded   = max((float) $district['fully_excluded_rate'], 0.01);
+$riskRatio          = (float) $district['exclusion_risk_score'] / $baselineExcluded;
+$simulatedRiskScore = round(max(5.0, (float) $district['exclusion_risk_score'] - ($exclusionReduction * $riskRatio)), 2);
+$riskScoreReduction = round((float) $district['exclusion_risk_score'] - $simulatedRiskScore, 2);
+
+// Expected exclusion for this district's poverty level, from the fitted
+// poverty model (the definition behind the "Mismatch Gap").
+$mismatchModel = $model['mismatch_gap_model'] ?? null;
+if (is_array($mismatchModel) && $mismatchModel['intercept'] !== null && $mismatchModel['poverty_slope'] !== null) {
+    $expectedExclusion = (float) $mismatchModel['intercept']
+                       + ((float) $mismatchModel['poverty_slope'] * (float) $district['poverty_rate']);
+} else {
+    $expectedExclusion = (float) $district['poverty_rate'] * 0.45;
+}
+
+$simulatedMismatchGap = round($simulatedExcludedRate - $expectedExclusion, 2);
+
+// Real-world scale: average district adult population in Rwanda ~ 200,000.
+$avgDistrictPop         = 200000;
 $estimatedBeneficiaries = (int) round(($exclusionReduction / 100) * $avgDistrictPop);
 
 // Prepare the response payload
@@ -89,6 +120,14 @@ $response = [
         'name'     => $district['district'],
         'province' => $district['province'],
     ],
+    'model' => [
+        'source'                 => $method,
+        'predictors'             => $model['intervention_model']['predictors'] ?? null,
+        'coefficients'           => $coefficients,
+        'r_squared'              => $model['intervention_model']['r_squared'] ?? null,
+        'n_observations'         => $model['intervention_model']['n'] ?? null,
+        'expected_exclusion_rate' => round($expectedExclusion, 2),
+    ],
     'baseline' => [
         'exclusion_risk_score' => (float) $district['exclusion_risk_score'],
         'fully_excluded_rate'  => (float) $district['fully_excluded_rate'],
@@ -98,15 +137,15 @@ $response = [
         'phone_penetration_boost'  => $phoneBoost,
         'agent_network_boost'      => $agentBoost,
         'financial_literacy_boost' => $literacyBoost,
-        'total_risk_reduction'     => round($totalRiskReduction, 2),
+        'exclusion_rate_delta'     => round($exclusionDelta, 2),
     ],
     'simulated' => [
-        'exclusion_risk_score'       => $simulatedRiskScore,
-        'fully_excluded_rate'        => $simulatedExcludedRate,
-        'mismatch_gap'               => $simulatedMismatchGap,
-        'risk_score_reduction'       => round($district['exclusion_risk_score'] - $simulatedRiskScore, 2),
-        'exclusion_rate_reduction'   => $exclusionReduction,
-        'estimated_beneficiaries'    => $estimatedBeneficiaries
+        'exclusion_risk_score'     => $simulatedRiskScore,
+        'fully_excluded_rate'      => $simulatedExcludedRate,
+        'mismatch_gap'             => $simulatedMismatchGap,
+        'risk_score_reduction'     => $riskScoreReduction,
+        'exclusion_rate_reduction' => $exclusionReduction,
+        'estimated_beneficiaries'  => $estimatedBeneficiaries
     ]
 ];
 
