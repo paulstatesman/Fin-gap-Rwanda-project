@@ -29,7 +29,7 @@ export const fetchModel = () =>
 
 /**
  * generatePolicyReport — calls the Gemini API directly from the browser
- * to produce a localized policy brief for a district mayor.
+ * to produce a localized policy brief for local government leaders.
  *
  * Falls back to a deterministic template when no API key is configured
  * or when the API call fails, so the feature always works.
@@ -95,7 +95,7 @@ export const generatePolicyReport = async (district, allDistricts = []) => {
 
     return `## Executive Policy Brief — ${district.district} District
 
-**Prepared for:** Mayor of ${district.district} District (Uturere)
+**Prepared for:** Local Government Leadership � ${district.district} District
 **Reference Framework:** NST2 · National Financial Inclusion Strategy 2026
 **Date:** ${new Date().toLocaleDateString('en-RW', { year: 'numeric', month: 'long', day: 'numeric' })}
 **Classification:** For Official Use
@@ -170,7 +170,7 @@ The District Executive Committee should track the following indicators quarterly
     return buildFallbackReport();
   }
 
-  const prompt = `You are a senior financial inclusion policy advisor writing for the District Mayor (Umuyobozi w'Uturere) of ${district.district} District, Rwanda.
+  const prompt = `You are a senior financial inclusion policy advisor writing for the local government leadership of ${district.district} District, Rwanda.
 
 Using the statistical data below from the FIN-GAP Mismatch Tool, write a concise, authoritative Executive Policy Brief in Markdown format. The brief must:
 1. Be written in English, reference Rwanda's NST2 and MINECOFIN / BNR where relevant.

@@ -213,7 +213,7 @@ const PolicyBrief = ({ districts = [] }) => {
       <div className="card-header">
         <h2><i className="fa-solid fa-file-contract"></i> Executive Policy Brief</h2>
         <div className="card-desc">
-          Dynamically generated, localized policy PDF reports for District Mayors (Uturere) — powered by the Mismatch Matrix.
+          Dynamically generated, localized policy PDF reports for local government leaders — powered by the Mismatch Matrix.
         </div>
       </div>
 
@@ -288,7 +288,7 @@ const PolicyBrief = ({ districts = [] }) => {
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
             <i className="fa-solid fa-wand-magic-sparkles text-purple"></i>
             <h3 style={{ fontSize: '15px', color: 'var(--gold)', margin: 0 }}>
-              District Mayor Report Generator
+              Report Generator
             </h3>
           </div>
           <div className="report-gen-badges">
@@ -307,14 +307,14 @@ const PolicyBrief = ({ districts = [] }) => {
           </div>
         </div>
         <p className="text-dim" style={{ fontSize: '12.5px', marginBottom: '16px' }}>
-          Select a district to dynamically generate a localized policy brief tailored for its Mayor (Uturere),
+          Select a district to dynamically generate a localized policy brief tailored for its local government leader,
           drawing insights directly from the Mismatch Matrix data.
         </p>
 
         {/* Selector + Button */}
         <div className="report-gen-controls">
           <div className="sim-select" style={{ flex: 1, marginBottom: 0 }}>
-            <label>Select District (Uturere)</label>
+            <label>Select District</label>
             <select
               value={selectedDistrictId}
               onChange={e => {
