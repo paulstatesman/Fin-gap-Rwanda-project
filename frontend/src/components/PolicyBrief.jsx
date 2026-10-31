@@ -68,10 +68,6 @@ const PolicyBrief = () => {
             </ul>
           </div>
         </div>
-
-        <div className="ai-note mt-4">
-          <i className="fa-solid fa-robot"></i> <strong>Note on Hackathon Integration:</strong> In a production environment, this tab could dynamically generate localized policy PDF reports for District Mayors (Uturere) using a LLM backend API, drawing insights directly from the Mismatch Matrix.
-        </div>
       </div>
     </div>
   );
