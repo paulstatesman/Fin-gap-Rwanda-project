@@ -325,9 +325,9 @@ const ExclusionHeatmap = ({ districts = [], onSelectDistrict, selectedId, active
               type="button"
               className={`view-btn ${viewMode === 'svg' ? 'active' : ''}`}
               onClick={() => setViewMode('svg')}
-              title="Interactive Vector Map (Requires 0 APIs / Works 100% Offline)"
+              title="Interactive Vector Map (Works 100% Offline)"
             >
-              <i className="fa-solid fa-map"></i> <span>Vector Map (Zero API)</span>
+              <i className="fa-solid fa-map"></i> <span>Vector Map</span>
             </button>
             <button
               type="button"
@@ -379,7 +379,7 @@ const ExclusionHeatmap = ({ districts = [], onSelectDistrict, selectedId, active
 
       {/* MAIN VIEW CONTAINER */}
       <div className="heatmap-viewport">
-        {/* VIEW 1: SVG Vector Heatmap (Zero API Required) */}
+        {/* VIEW 1: SVG Vector Heatmap */}
         {viewMode === 'svg' && (
           <div className="svg-map-wrapper">
             <div className="svg-map-header">
@@ -389,7 +389,7 @@ const ExclusionHeatmap = ({ districts = [], onSelectDistrict, selectedId, active
               </div>
               <div className="svg-badge-offline">
                 <i className="fa-solid fa-bolt text-emerald"></i>
-                <span>Standalone Vector Mode • Zero API Required</span>
+                <span>Standalone Vector Mode</span>
               </div>
             </div>
 
@@ -628,7 +628,7 @@ const ExclusionHeatmap = ({ districts = [], onSelectDistrict, selectedId, active
           </div>
         )}
 
-        {/* VIEW 2: Heat Matrix & Ranked Table (Zero API Required) */}
+        {/* VIEW 2: Heat Matrix & Ranked Table */}
         {viewMode === 'matrix' && (
           <div className="matrix-view-container">
             <div className="matrix-view-header">

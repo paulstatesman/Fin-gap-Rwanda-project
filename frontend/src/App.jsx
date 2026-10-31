@@ -89,7 +89,7 @@ const App = () => {
                 <div className="card-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <h2><i className="fa-solid fa-fire text-red"></i> Geographic Financial Exclusion Heatmap</h2>
                   <span className="badge-data" style={{ fontSize: '11px', padding: '4px 10px', borderRadius: '999px', background: 'rgba(255,255,255,0.06)' }}>
-                    <i className="fa-solid fa-shield-halved text-teal"></i> Zero-API Ready
+                    <i className="fa-solid fa-shield-halved text-teal"></i> Offline Ready
                   </span>
                 </div>
                 <ExclusionHeatmap

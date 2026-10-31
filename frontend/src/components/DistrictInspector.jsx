@@ -140,7 +140,7 @@ const DistrictInspector = ({ districtId }) => {
 
       <div className="ai-assistant-block">
         <div className="ai-header">
-          <i className="fa-solid fa-robot"></i> AI Policy Advisor
+          <i className="fa-solid fa-lightbulb"></i> Advice
         </div>
         <div className="ai-content">
           Based on the mismatch gap of <strong>{details.mismatch_gap}</strong> and high informal employment 
