@@ -8,7 +8,7 @@
 
 ## 1. What this project does
 
-FIN-GAP RWANDA is an interactive dashboard that helps policymakers, civil society and development
+FIN-GAP RWANDA is an interactive dashboard that helps policymakers, civil society, and development
 partners find **where financial inclusion is failing relative to poverty levels**.
 
 Cross-analysing district poverty rates against financial-access data, it computes a **Mismatch Gap**:
@@ -16,7 +16,7 @@ the difference between a district's *actual* rate of full financial exclusion an
 *expect* given its poverty level.
 
 - **Large positive gap → "Severely Underserved".** Exclusion is worse than poverty alone explains,
-  pointing to structural barriers (distance to agents, network coverage, financial literacy).
+  pointing to structural barriers (distance to agents, network coverage, gender gap, literacy).
 - **Gap near zero → "Balanced".** Exclusion tracks poverty as expected.
 - **Negative gap → "Well-Served".** Exclusion is *lower* than poverty predicts, suggesting effective
   interventions or unusual local economic drivers.
@@ -27,12 +27,12 @@ targeted, and what kind?*
 
 ### Alignment with national priorities
 
-| NST2 (2024–2029) pillar | How FIN-GAP RWANDA contributes |
+| NST2 (2024–2029) Pillar | How FIN-GAP RWANDA Contributes |
 |---|---|
-| Economic Transformation — *"Resilient and broadened financial sector for private sector growth"* | Identifies districts where the financial sector is structurally under-serving the population |
-| Social Transformation — *"Enhanced graduation from poverty and increased resilience"* | Links exclusion hotspots to concrete interventions owned by named institutions (BNR, MINICT, MINECOFIN, MINAGRI) |
+| **Economic Transformation** — *"Resilient and broadened financial sector for private sector growth"* | Identifies districts where the financial sector is structurally under-serving the population. |
+| **Social Transformation** — *"Enhanced graduation from poverty and increased resilience"* | Links exclusion hotspots to concrete interventions owned by named institutions (BNR, MINICT, MINECOFIN, MINAGRI). |
 
-The tool supports the **Vision 2050** ambition of universal access to financial services.
+The tool directly supports Rwanda's **Vision 2050** ambition of universal financial access and digital inclusion.
 
 ---
 
@@ -44,7 +44,7 @@ The tool supports the **Vision 2050** ambition of universal access to financial 
 > ranges* of the real sources below so that the prototype can run without restricted microdata.
 >
 > **It is not official NISR or AFR statistics.** The methodology is sound and fully reproducible,
-> but the specific district figures must be replaced with the real microdata before any policy or
+> but the specific district figures must be replaced with the real microdata before any official policy or
 > publication use. See §3 for how to load the real data.
 
 ### Intended real sources
@@ -61,6 +61,7 @@ The tool supports the **Vision 2050** ambition of universal access to financial 
 - `database/schema.sql` — PostgreSQL schema (provinces, districts, demographics, exclusion drivers, policy recommendations).
 - `database/seed.sql` — the illustrative dataset currently loaded (30 districts). **Load the real
   data here to switch the app to official figures.**
+- `frontend/src/services/localDistricts.json` — bundled district data allowing the tool to run 100% offline and standalone.
 
 Reference points from the real FinScope 2024 report that informed the design: 96% of Rwandan adults
 were financially included and 4% excluded nationally, with 12 districts above the national exclusion
@@ -70,40 +71,37 @@ level and the Northern and Western provinces recording higher-than-average exclu
 
 ## 3. Running it locally (works on any machine)
 
-**Prerequisites:** PHP 8+ with `pdo_pgsql`, Node.js 18+, and a PostgreSQL 13+ database.
+**Prerequisites:** Node.js 18+ (for frontend) and optionally PHP 8+ with `pdo_pgsql` and PostgreSQL 13+ (for live backend).
 
-### 3.1 Database
+### 3.1 Frontend (React)
 
-```bash
-createdb fingap_rwanda
-psql -d fingap_rwanda -f database/schema.sql
-psql -d fingap_rwanda -f database/seed.sql
-```
-
-### 3.2 Backend API (PHP)
-
-```bash
-cd backend
-# Point the app at your database (any of these work)
-export DATABASE_URL="postgresql://user:password@host:5432/fingap_rwanda"
-# ...or use DB_HOST / DB_PORT / DB_NAME / DB_USER / DB_PASSWORD
-
-php -S localhost:8000 router.php
-```
-
-Verify it is alive: <http://localhost:8000/api/national-summary>
-
-### 3.3 Frontend (React)
+The frontend runs with or without the backend running (offline fallback built in):
 
 ```bash
 cd frontend
 npm install
-REACT_APP_API_URL=http://localhost:8000 npm start
+npm start
 ```
 
 The dashboard opens at <http://localhost:3000>.
 
-### 3.4 API reference
+### 3.2 Backend API (Optional - PHP)
+
+```bash
+# Setup database
+createdb fingap_rwanda
+psql -d fingap_rwanda -f database/schema.sql
+psql -d fingap_rwanda -f database/seed.sql
+
+# Start PHP built-in server
+cd backend
+export DATABASE_URL="postgresql://user:password@host:5432/fingap_rwanda"
+php -S localhost:8000 router.php
+```
+
+Verify backend status: <http://localhost:8000/api/national-summary>
+
+### 3.3 API reference
 
 | Method | Endpoint | Purpose |
 |---|---|---|
@@ -113,8 +111,6 @@ The dashboard opens at <http://localhost:3000>.
 | `GET` | `/api/model` | Live-fitted regression coefficients and R² powering the Mismatch Gap and simulator |
 | `POST` | `/api/simulate` | Policy scenario simulation (JSON body) |
 
-CORS is handled centrally in `backend/cors.php` and allows the deployed frontend origin.
-
 ---
 
 ## 4. How to use the dashboard
@@ -123,20 +119,17 @@ The deployed app is at **<https://fingap-rw.vercel.app>** — no login required.
 
 | Tab | What to do |
 |---|---|
-| **Heatmap** | Each bubble is a district, coloured by Mismatch Gap (red = severely underserved). Click any bubble to open the inspector and read that district's exclusion drivers and tailored policy recommendations. |
-| **Matrix** | Scatter plot of poverty vs. exclusion. Districts in the upper-left quadrant are the priority targets. Click any point to inspect it. |
-| **Simulator** | Choose a district, then drag the three intervention sliders (phone penetration, agent density, financial literacy) and press **Run Simulation**. The projection shows the modelled change in exclusion rate, risk score and the estimated number of newly-included adults. |
-| **Policy Brief** | Auto-generated, district-specific recommendations assigned to the responsible institution (BNR, MINICT, MINECOFIN, MINAGRI). |
-| **Methodology** | Full explanation of the data sources, the Mismatch Gap definition, and the **live-fitted regression** (equation, coefficients and R²) behind every number in the app. |
+| **Heatmap** | Multi-view geographic visualization (Vector Map, Heat Matrix Grid, and Satellite Map). Click any district to open the Inspector and read its demographic breakdown, core metrics, exclusion drivers, and targeted Advice. |
+| **Matrix** | Scatter plot of poverty vs. exclusion. Districts in the upper-left quadrant are the priority targets (high exclusion despite lower poverty). Click any point to inspect it. |
+| **Simulator** | Choose a district, adjust the three intervention sliders (Mobile Phone Penetration, Agent Network Density, Financial Literacy Coverage), and click **Run Simulation**. Instantly projects the reduction in exclusion rate, risk score, and newly banked citizens. |
+| **Policy Brief** | Contains national NST2 alignment tables, plus an interactive **Report Generator**: select any district to dynamically generate an executive policy brief for local government leaders, with instant **Print/Download as PDF** capability. |
+| **Methodology** | Full explanation of data sources, the mathematical Mismatch Gap definition, and the **live regression** (formula, fitted coefficients, and R²) powering the tool. |
 
 ### The modelling approach in one line each
 
 - **Mismatch Gap** — OLS regression of exclusion on poverty; the residual is the gap.
-- **Simulator** — a second OLS regression of exclusion on mobile money penetration, formal banking
-  access and low-education share; the fitted coefficients *are* the intervention sensitivities.
-- Both regressions are computed **from the live database at request time** (`backend/model.php`) and
-  exposed via `/api/model`, so the app displays real fitted numbers rather than hard-coded
-  assumptions. No external ML libraries are required.
+- **Simulator** — regression sensitivity model weighted on mobile access, physical agent density, and education share; fitted coefficients act as intervention impact multipliers.
+- Computed dynamically both at request time on the backend (`backend/model.php`) and in the client-side engine (`frontend/src/services/api.js`) for seamless offline resilience.
 
 ---
 
@@ -151,11 +144,16 @@ The deployed app is at **<https://fingap-rw.vercel.app>** — no login required.
 │   ├── index.php       Route dispatcher
 │   └── Dockerfile      Deployment image
 ├── frontend/           React dashboard
-│   └── src/
-│       ├── components/ Map, matrix, simulator, policy brief, methodology
-│       └── services/   API client
-├── database/           schema.sql + seed.sql  (data)
-└── docs/               NISR hackathon webinar decks
+│   ├── src/
+│   │   ├── components/ Heatmap, matrix, simulator, policy brief, methodology, inspector
+│   │   └── services/   API client & local simulation engine
+│   └── public/
+├── database/           schema.sql + seed.sql (data)
+├── docs/               NISR hackathon webinar decks
+└── submission/         Final hackathon deliverables
+    ├── demo-video.mp4           Demonstration video (Git LFS)
+    ├── student-cards/           Student ID eligibility cards
+    └── SUBMISSION_CHECKLIST.md  Detailed submission checklist
 ```
 
 ---
@@ -164,14 +162,14 @@ The deployed app is at **<https://fingap-rw.vercel.app>** — no login required.
 
 | Requirement | Status |
 |---|---|
-| Public GitHub repository | ✅ this repo |
-| README explaining data, information and interaction | ✅ this file |
-| Full source code | ✅ `backend/` + `frontend/` |
-| Deployed, publicly accessible app | ✅ <https://fingap-rw.vercel.app> |
-| Video demonstration (`.webm`/`.gif`, ≤ 3 min) | ⏳ to be added |
-| Data file + link to the data | ✅ `database/` + links in §2 |
-| Student cards / eligibility documents (both members) | ⏳ to be added |
-| Sample login credentials (only if login required) | N/A — no login required |
+| Public GitHub repository | ✅ Completed (this repo) |
+| README explaining data, information, and interaction | ✅ Completed (`README.md`) |
+| Full source code | ✅ Completed (`backend/` + `frontend/`) |
+| Deployed, publicly accessible app | ✅ Completed (<https://fingap-rw.vercel.app>) |
+| Video demonstration (`.mp4`, ≤ 3 min) | ✅ Completed (`submission/demo-video.mp4`) |
+| Data file + link to the data | ✅ Completed (`database/` + `localDistricts.json`) |
+| Student cards / eligibility documents | ✅ Completed (`submission/student-cards/`) |
+| Sample login credentials | N/A — no login required |
 
 ---
 
@@ -193,7 +191,7 @@ intellectual property rights in the submitted work to the National Institute of 
 
 ## 8. Tech stack
 
-- **Frontend:** React 18, Chart.js (Mismatch Matrix), Leaflet + OpenStreetMap (interactive map)
-- **Backend:** PHP 8 (custom REST API; OLS regression implemented from scratch, no ML dependencies)
+- **Frontend:** React 18, Chart.js (Mismatch Matrix), Leaflet + OpenStreetMap (interactive map), FontAwesome
+- **Backend:** PHP 8 (custom REST API; OLS regression implemented from scratch, no external ML dependencies)
 - **Database:** PostgreSQL
 - **Deployment:** Vercel (frontend), Render (backend + database)
