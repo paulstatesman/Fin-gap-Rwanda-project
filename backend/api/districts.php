@@ -5,7 +5,8 @@
 // Supports: ?province=Western+Province&status=Severely+Underserved
 //           ?sort=mismatch_gap&order=desc
 // ============================================================
-
+require_once __DIR__ . '/cors.php';
+require_once __DIR__ . '/config/database.php';
 require_once __DIR__ . '/../config/database.php';
 
 $pdo = getDBConnection();
