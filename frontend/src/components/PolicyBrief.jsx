@@ -15,32 +15,34 @@ const PolicyBrief = () => {
 
         <h3>Strategic Alignment with NST2 Priorities</h3>
         
-        <table className="nst2-table">
-          <thead>
-            <tr>
-              <th>NST2 Pillar</th>
-              <th>FIN-GAP Finding</th>
-              <th>Recommended Policy Action (MINECOFIN / BNR)</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td><strong>Economic Transformation</strong><br/><span className="text-dim">Job Creation & Agriculture</span></td>
-              <td>Deep reliance on informal savings (Ikimina) in rural agricultural districts (e.g., Nyanza, Gatsibo) despite growing mobile money usage.</td>
-              <td>Digitize VSLA (Village Savings and Loan Associations) and integrate agricultural cooperative payouts directly into mobile wallets.</td>
-            </tr>
-            <tr>
-              <td><strong>Social Transformation</strong><br/><span className="text-dim">Eradicating Extreme Poverty</span></td>
-              <td>Severely Underserved districts show a massive gender gap in financial access and phone ownership (e.g., Rutsiro female exclusion at 31%).</td>
-              <td>Launch the <strong>"Agent Kazi"</strong> female agent network pilot and subsidize smart-feature phones for female heads of households.</td>
-            </tr>
-            <tr>
-              <td><strong>Transformational Governance</strong><br/><span className="text-dim">Service Delivery</span></td>
-              <td>Remote districts with harsh topography (Ngororero, Nyaruguru) suffer from high agent distance barriers.</td>
-              <td>Mandate BNR cash-float subsidies for agents operating in extreme rural sectors to ensure liquidity. Establish shared MFI digital kiosks at Sector offices.</td>
-            </tr>
-          </tbody>
-        </table>
+        <div className="table-scroll-x">
+          <table className="nst2-table">
+            <thead>
+              <tr>
+                <th>NST2 Pillar</th>
+                <th>FIN-GAP Finding</th>
+                <th>Recommended Policy Action (MINECOFIN / BNR)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Economic Transformation</strong><br/><span className="text-dim">Job Creation & Agriculture</span></td>
+                <td>Deep reliance on informal savings (Ikimina) in rural agricultural districts (e.g., Nyanza, Gatsibo) despite growing mobile money usage.</td>
+                <td>Digitize VSLA (Village Savings and Loan Associations) and integrate agricultural cooperative payouts directly into mobile wallets.</td>
+              </tr>
+              <tr>
+                <td><strong>Social Transformation</strong><br/><span className="text-dim">Eradicating Extreme Poverty</span></td>
+                <td>Severely Underserved districts show a massive gender gap in financial access and phone ownership (e.g., Rutsiro female exclusion at 31%).</td>
+                <td>Launch the <strong>"Agent Kazi"</strong> female agent network pilot and subsidize smart-feature phones for female heads of households.</td>
+              </tr>
+              <tr>
+                <td><strong>Transformational Governance</strong><br/><span className="text-dim">Service Delivery</span></td>
+                <td>Remote districts with harsh topography (Ngororero, Nyaruguru) suffer from high agent distance barriers.</td>
+                <td>Mandate BNR cash-float subsidies for agents operating in extreme rural sectors to ensure liquidity. Establish shared MFI digital kiosks at Sector offices.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
 
         <h3>The "Mismatch" Intervention Strategy</h3>
         <p>

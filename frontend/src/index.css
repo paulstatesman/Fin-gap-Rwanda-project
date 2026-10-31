@@ -113,7 +113,9 @@ a { color: var(--emerald); text-decoration: none; }
 
 .header-search {
   position: relative;
-  width: 280px;
+  flex: 1 1 200px;
+  width: 100%;
+  max-width: 280px;
 }
 
 .header-search i {
@@ -248,7 +250,7 @@ a { color: var(--emerald); text-decoration: none; }
   margin-bottom: 20px;
 }
 
-.search-wrap { flex: 1; min-width: 240px; position: relative; }
+.search-wrap { flex: 1 1 200px; min-width: 0; position: relative; }
 .search-wrap i { position: absolute; left: 13px; top: 50%; transform: translateY(-50%); color: var(--text-dim); }
 .search-wrap input {
   width: 100%; padding: 10px 14px 10px 38px;
@@ -272,7 +274,6 @@ a { color: var(--emerald); text-decoration: none; }
   grid-template-columns: 1.4fr 1fr;
   gap: 20px;
 }
-@media (max-width: 1100px) { .dashboard-grid { grid-template-columns: 1fr; } }
 
 /* ---- Card ---- */
 .card { padding: 22px; }
@@ -445,7 +446,6 @@ a { color: var(--emerald); text-decoration: none; }
 
 /* ---- Simulator ---- */
 .sim-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-@media (max-width: 900px) { .sim-layout { grid-template-columns: 1fr; } }
 
 .sim-select label { font-size: 12px; color: var(--text-secondary); display: block; margin-bottom: 6px; }
 .sim-select select {
@@ -495,7 +495,6 @@ a { color: var(--emerald); text-decoration: none; }
 .policy-doc ul { padding-left: 20px; font-size: 13px; line-height: 1.8; }
 
 .policy-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin: 16px 0; }
-@media (max-width: 760px) { .policy-grid { grid-template-columns: 1fr; } }
 
 .policy-box {
   background: rgba(0,0,0,.3); padding: 18px;
@@ -614,7 +613,7 @@ a { color: var(--emerald); text-decoration: none; }
   border: 1px solid var(--border-glass);
   border-radius: var(--radius-md);
 }
-.subbar-search { position: relative; flex: 1; min-width: 240px; }
+.subbar-search { position: relative; flex: 1 1 200px; min-width: 0; }
 .subbar-search i { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-dim); font-size: 12px; }
 .subbar-search input {
   width: 100%; padding: 9px 34px 9px 34px;
@@ -746,15 +745,107 @@ a { color: var(--emerald); text-decoration: none; }
 .matrix-heat-cell { display: inline-block; padding: 3px 8px; border-radius: var(--radius-sm); }
 
 /* ---- VIEW 3: Leaflet Wrapper ---- */
-.leaflet-map-wrapper { border-radius: var(--radius-lg); overflow: hidden; height: auto; }
+.leaflet-map-wrapper { border-radius: var(--radius-lg); overflow: hidden; }
 .leaflet-popup-content-wrapper { border-radius: var(--radius-md); }
 
-/* ---- Responsive ---- */
+/* ============================================================
+   RESPONSIVE HARDENING — fluid layout from 320px phones to 1440px desktops
+   ============================================================ */
+
+html { -webkit-text-size-adjust: 100%; }
+body { overflow-wrap: break-word; }
+img, svg, video, canvas { max-width: 100%; }
+
+/* Grid tracks must be allowed to shrink below their intrinsic content width.
+   Without minmax(0, …) a wide table or map forces horizontal page scroll. */
+.dashboard-grid { grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); }
+.dashboard-grid > *,
+.sim-layout > *,
+.policy-grid > *,
+.heat-cards-grid > * { min-width: 0; }
+
+.kpi-banner       { grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr)); }
+.metrics-grid-2   { grid-template-columns: repeat(auto-fit, minmax(min(140px, 100%), 1fr)); }
+.demographic-grid { grid-template-columns: repeat(auto-fit, minmax(min(150px, 100%), 1fr)); }
+.sim-layout       { grid-template-columns: repeat(auto-fit, minmax(min(320px, 100%), 1fr)); }
+.policy-grid      { grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr)); }
+.heat-cards-grid  { grid-template-columns: repeat(auto-fit, minmax(min(230px, 100%), 1fr)); }
+
+/* Fixed widths become fluid */
+.header-right { flex-wrap: wrap; gap: 14px; }
+
+/* Rows that were rigid now wrap */
+.card-header        { flex-wrap: wrap; gap: 10px; }
+.district-title-row { flex-wrap: wrap; }
+.sim-score-row      { flex-wrap: wrap; gap: 16px; }
+.filter-group       { flex-wrap: wrap; }
+
+/* Scroll regions stay usable on short viewports */
+.table-wrap             { max-height: min(560px, 70vh); -webkit-overflow-scrolling: touch; }
+.table-scroll-container { max-height: min(520px, 65vh); -webkit-overflow-scrolling: touch; }
+.table-scroll-x         { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.nst2-table             { min-width: 620px; }
+.formula-box            { overflow-x: auto; }
+.nav-tabs               { -webkit-overflow-scrolling: touch; }
+
+/* Charts and the map scale with viewport height */
+.chart-wrapper       { height: clamp(300px, 52vh, 460px); }
+.leaflet-map-wrapper { height: clamp(320px, 55vh, 560px); }
+.leaflet-container   { width: 100%; }
+
+/* ---- Tablet / small laptop ---- */
+@media (max-width: 1100px) {
+  .dashboard-grid { grid-template-columns: minmax(0, 1fr); }
+}
+
 @media (max-width: 900px) {
+  .sim-layout      { grid-template-columns: minmax(0, 1fr); }
+  .heat-cards-grid { grid-template-columns: repeat(auto-fit, minmax(min(230px, 100%), 1fr)); }
   .heatmap-toolbar { flex-direction: column; align-items: stretch; }
   .metric-toggle-group, .view-mode-tabs { width: 100%; }
-  .metric-btn, .view-btn { flex: 1; justify-content: center; }
-  .heat-cards-grid { grid-template-columns: 1fr; }
+  .metric-btn, .view-btn { flex: 1 1 auto; justify-content: center; }
   .svg-tooltip-card { display: none; }
+}
+
+/* ---- Phone ---- */
+@media (max-width: 768px) {
+  .page-container { padding: 16px 14px; }
+  .header-inner   { padding: 12px 14px; gap: 12px; }
+  .nav-tabs       { padding: 0 14px; }
+  .app-footer     { margin-top: 32px; padding: 18px 14px; }
+  .card           { padding: 16px; }
+
+  .header-right  { width: 100%; gap: 10px; }
+  .header-search { flex: 1 1 100%; max-width: none; }
+  .brand-logo    { width: 40px; height: 40px; font-size: 18px; }
+  .brand-title   { font-size: clamp(16px, 4.6vw, 20px); }
+
+  .kpi-card  { padding: 14px; gap: 12px; }
+  .kpi-icon  { width: 42px; height: 42px; font-size: 17px; }
+  .kpi-value { font-size: 20px; }
+  .kpi-label { font-size: 10px; }
+
+  .card-header h2        { font-size: 14px; }
+  .district-title-row h3 { font-size: 19px; }
+  .metric-box h4         { font-size: 16px; }
+  .sim-score-item h3     { font-size: 24px; }
+  .inspector-placeholder { padding: 26px 16px; }
+
+  .provincial-strip, .heatmap-toolbar, .heatmap-subbar { padding: 10px; }
+  .svg-map-wrapper, .matrix-view-header { padding: 10px 12px; }
+  .district-table th, .district-table td { padding: 9px 10px; font-size: 12px; }
+  .heat-matrix-table th, .heat-matrix-table td { padding: 8px 9px; }
+
+  .chart-wrapper, .leaflet-map-wrapper { height: clamp(280px, 46vh, 400px); }
+}
+
+/* ---- Small phone ---- */
+@media (max-width: 480px) {
+  .nav-tab      { padding: 11px 13px; font-size: 12px; }
+  .badge        { font-size: 9.5px; padding: 4px 8px; }
+  .formula-box  { font-size: 12px; padding: 12px; }
+  .policy-doc p, .method-body p { font-size: 12.5px; }
+  .policy-doc ul, .method-body ul { padding-left: 16px; }
+  .kpi-banner   { grid-template-columns: minmax(0, 1fr); }
 }
 

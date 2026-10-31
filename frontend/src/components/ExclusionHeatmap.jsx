@@ -800,7 +800,7 @@ const ExclusionHeatmap = ({ districts = [], onSelectDistrict, selectedId, active
             <MapContainer
               center={[-1.9403, 29.8739]}
               zoom={8.5}
-              style={{ height: '560px', width: '100%', borderRadius: '14px' }}
+              style={{ height: '100%', width: '100%', borderRadius: '14px' }}
             >
               <TileLayer
                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
