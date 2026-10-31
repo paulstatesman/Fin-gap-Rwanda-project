@@ -1,13 +1,25 @@
 import React, { useState } from 'react';
 
-const DistrictTable = ({ districts, selectedId, onSelectDistrict }) => {
+const DistrictTable = ({ districts, selectedId, onSelectDistrict, activeFilter, summary }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('All');
 
   const filteredDistricts = districts.filter(d => {
     const matchesSearch = d.district.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStatus = statusFilter === 'All' || d.mismatch_status === statusFilter;
-    return matchesSearch && matchesStatus;
+    
+    let matchesActiveFilter = true;
+    if (activeFilter) {
+      switch (activeFilter) {
+        case 'underserved': matchesActiveFilter = d.mismatch_status === 'Severely Underserved'; break;
+        case 'excluded': matchesActiveFilter = d.fully_excluded_rate > summary.avg_fully_excluded_rate; break;
+        case 'mobile': matchesActiveFilter = d.mobile_money_rate < summary.avg_mobile_money_rate; break;
+        case 'mismatch': matchesActiveFilter = d.id === summary.worst_district?.id; break;
+        default: matchesActiveFilter = true;
+      }
+    }
+    
+    return matchesSearch && matchesStatus && matchesActiveFilter;
   });
 
   const getStatusPill = (status) => {

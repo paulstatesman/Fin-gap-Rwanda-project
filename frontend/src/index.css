@@ -212,9 +212,11 @@ a { color: var(--emerald); text-decoration: none; }
 .kpi-card {
   padding: 20px;
   display: flex; align-items: center; gap: 16px;
-  transition: transform .2s, box-shadow .2s;
+  transition: transform .2s, box-shadow .2s, border-color .2s, background .2s;
 }
-.kpi-card:hover { transform: translateY(-2px); box-shadow: var(--glow-emerald); }
+.kpi-card.clickable { cursor: pointer; }
+.kpi-card:hover { transform: translateY(-2px); box-shadow: var(--glow-emerald); background: var(--bg-card-hover); }
+.kpi-card.active { border-color: var(--emerald) !important; background: rgba(16,185,129,0.1) !important; box-shadow: 0 0 20px rgba(16,185,129,0.2) !important; }
 
 .kpi-icon {
   width: 50px; height: 50px; border-radius: 12px;

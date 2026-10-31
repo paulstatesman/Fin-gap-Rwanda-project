@@ -1,9 +1,13 @@
 import React from 'react';
 
-const KPIBanner = ({ summary }) => {
+const KPIBanner = ({ summary, activeFilter, onFilterChange }) => {
   return (
     <div className="kpi-banner">
-      <div className="glass kpi-card" style={{ borderLeft: '4px solid var(--red)' }}>
+      <div 
+        className={`glass kpi-card clickable ${activeFilter === 'underserved' ? 'active' : ''}`} 
+        style={{ borderLeft: '4px solid var(--red)' }}
+        onClick={() => onFilterChange('underserved')}
+      >
         <div className="kpi-icon icon-red">
           <i className="fa-solid fa-triangle-exclamation"></i>
         </div>
@@ -14,7 +18,11 @@ const KPIBanner = ({ summary }) => {
         </div>
       </div>
       
-      <div className="glass kpi-card" style={{ borderLeft: '4px solid var(--orange)' }}>
+      <div 
+        className={`glass kpi-card clickable ${activeFilter === 'excluded' ? 'active' : ''}`} 
+        style={{ borderLeft: '4px solid var(--orange)' }}
+        onClick={() => onFilterChange('excluded')}
+      >
         <div className="kpi-icon icon-orange">
           <i className="fa-solid fa-users-slash"></i>
         </div>
@@ -25,7 +33,11 @@ const KPIBanner = ({ summary }) => {
         </div>
       </div>
 
-      <div className="glass kpi-card" style={{ borderLeft: '4px solid var(--teal)' }}>
+      <div 
+        className={`glass kpi-card clickable ${activeFilter === 'mobile' ? 'active' : ''}`} 
+        style={{ borderLeft: '4px solid var(--teal)' }}
+        onClick={() => onFilterChange('mobile')}
+      >
         <div className="kpi-icon icon-teal">
           <i className="fa-solid fa-mobile-screen"></i>
         </div>
@@ -36,7 +48,15 @@ const KPIBanner = ({ summary }) => {
         </div>
       </div>
 
-      <div className="glass kpi-card" style={{ border: '1px solid rgba(245,158,11,0.3)', borderLeft: '4px solid var(--gold)', boxShadow: '0 0 20px rgba(245,158,11,0.1)' }}>
+      <div 
+        className={`glass kpi-card clickable ${activeFilter === 'mismatch' ? 'active' : ''}`} 
+        style={{ 
+          border: '1px solid rgba(245,158,11,0.3)', 
+          borderLeft: '4px solid var(--gold)', 
+          boxShadow: activeFilter === 'mismatch' ? '0 0 25px rgba(245,158,11,0.25)' : '0 0 20px rgba(245,158,11,0.1)' 
+        }}
+        onClick={() => onFilterChange('mismatch')}
+      >
         <div className="kpi-icon" style={{ background: 'rgba(245,158,11,0.2)', color: 'var(--gold)' }}>
           <i className="fa-solid fa-bullseye"></i>
         </div>

@@ -15,6 +15,7 @@ const App = () => {
   const [districts, setDistricts] = useState([]);
   const [summary, setSummary] = useState(null);
   const [selectedDistrict, setSelectedDistrict] = useState(null);
+  const [activeFilter, setActiveFilter] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -67,7 +68,18 @@ const App = () => {
         {loading ? (
           <div className="skeleton" style={{ height: '200px', width: '100%', marginBottom: '24px' }}></div>
         ) : (
-          summary && <KPIBanner summary={summary} />
+          summary && (
+            <KPIBanner 
+              summary={summary} 
+              activeFilter={activeFilter} 
+              onFilterChange={(filter) => {
+                setActiveFilter(filter === activeFilter ? null : filter);
+                if (filter === 'mismatch' && summary.worst_district) {
+                  handleDistrictSelect(summary.worst_district.id);
+                }
+              }} 
+            />
+          )
         )}
 
         <div className="tab-content">
@@ -77,7 +89,13 @@ const App = () => {
                 <div className="card-header">
                   <h2><i className="fa-solid fa-map-location-dot"></i> Geographical Exclusion Heatmap</h2>
                 </div>
-                <RwandaMap districts={districts} onSelectDistrict={handleDistrictSelect} selectedId={selectedDistrict} />
+                <RwandaMap 
+                  districts={districts} 
+                  onSelectDistrict={handleDistrictSelect} 
+                  selectedId={selectedDistrict}
+                  activeFilter={activeFilter}
+                  summary={summary}
+                />
               </div>
               <div className="glass card">
                 <DistrictInspector districtId={selectedDistrict} />
@@ -93,7 +111,13 @@ const App = () => {
                 </div>
                 <MismatchChart districts={districts} onSelectDistrict={handleDistrictSelect} />
                 <div className="mt-4">
-                  <DistrictTable districts={districts} onSelectDistrict={handleDistrictSelect} selectedId={selectedDistrict} />
+                  <DistrictTable 
+                    districts={districts} 
+                    onSelectDistrict={handleDistrictSelect} 
+                    selectedId={selectedDistrict}
+                    activeFilter={activeFilter}
+                    summary={summary}
+                  />
                 </div>
               </div>
               <div className="glass card">

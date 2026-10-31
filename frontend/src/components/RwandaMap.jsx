@@ -18,7 +18,7 @@ const districtCoordinates = {
   'Rwamagana': [-1.95, 30.40]
 };
 
-const RwandaMap = ({ districts, onSelectDistrict, selectedId }) => {
+const RwandaMap = ({ districts, onSelectDistrict, selectedId, activeFilter, summary }) => {
   // Center of Rwanda
   const position = [-1.9403, 29.8739];
 
@@ -27,6 +27,17 @@ const RwandaMap = ({ districts, onSelectDistrict, selectedId }) => {
     if (gap > 5)  return '#f59e0b'; // Gold (Moderate)
     if (gap > -5) return '#3b82f6'; // Blue (Balanced)
     return '#10b981';               // Emerald (Well Served)
+  };
+
+  const isHighlighted = (d) => {
+    if (!activeFilter) return true;
+    switch (activeFilter) {
+      case 'underserved': return d.mismatch_status === 'Severely Underserved';
+      case 'excluded': return d.fully_excluded_rate > summary.avg_fully_excluded_rate;
+      case 'mobile': return d.mobile_money_rate < summary.avg_mobile_money_rate;
+      case 'mismatch': return d.id === summary.worst_district?.id;
+      default: return true;
+    }
   };
 
   return (
@@ -41,6 +52,7 @@ const RwandaMap = ({ districts, onSelectDistrict, selectedId }) => {
           if (!coords) return null;
           
           const isSelected = selectedId === d.id;
+          const highlighted = isHighlighted(d);
           
           return (
             <CircleMarker
@@ -49,10 +61,11 @@ const RwandaMap = ({ districts, onSelectDistrict, selectedId }) => {
               pathOptions={{
                 color: isSelected ? '#fff' : getColor(d.mismatch_gap),
                 fillColor: getColor(d.mismatch_gap),
-                fillOpacity: 0.7,
-                weight: isSelected ? 3 : 1
+                fillOpacity: highlighted ? 0.7 : 0.1,
+                weight: isSelected ? 3 : 1,
+                opacity: highlighted ? 1 : 0.1
               }}
-              radius={isSelected ? 12 : 8}
+              radius={isSelected ? 12 : highlighted ? 8 : 4}
               eventHandlers={{
                 click: () => onSelectDistrict(d.id),
               }}
