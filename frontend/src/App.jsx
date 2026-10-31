@@ -47,9 +47,19 @@ const App = () => {
     }
   };
 
+  const handleSearch = (query) => {
+    if (!query) return;
+    const match = districts.find(d => 
+      d.district.toLowerCase().includes(query.toLowerCase())
+    );
+    if (match) {
+      handleDistrictSelect(match.id);
+    }
+  };
+
   return (
     <div className="app-container">
-      <Header activeTab={activeTab} setActiveTab={setActiveTab} />
+      <Header activeTab={activeTab} setActiveTab={setActiveTab} onSearch={handleSearch} />
       
       <main className="page-container">
         {error && <div className="error-box"><i className="fa-solid fa-triangle-exclamation"></i> {error}</div>}

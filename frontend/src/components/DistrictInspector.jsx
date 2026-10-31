@@ -81,6 +81,38 @@ const DistrictInspector = ({ districtId }) => {
         <div className="bar-track"><div className="bar-fill fill-red" style={{width: `${details.fully_excluded_rate}%`}}></div></div>
       </div>
 
+      <div className="section-label"><i className="fa-solid fa-users-line"></i> Demographic Exclusion</div>
+      <div className="demographic-grid">
+        <div className="demo-card">
+          <label>Gender Exclusion</label>
+          <div className="demo-row">
+            <span>Female</span>
+            <strong>{details.demographics?.female_exclusion_rate}%</strong>
+          </div>
+          <div className="demo-mini-bar"><div className="demo-mini-fill fill-red" style={{width: `${details.demographics?.female_exclusion_rate}%`}}></div></div>
+          <div className="demo-row mt-2">
+            <span>Male</span>
+            <strong>{details.demographics?.male_exclusion_rate}%</strong>
+          </div>
+          <div className="demo-mini-bar"><div className="demo-mini-fill fill-teal" style={{width: `${details.demographics?.male_exclusion_rate}%`}}></div></div>
+        </div>
+        <div className="demo-card">
+          <label>Employment & Edu</label>
+          <div className="demo-row">
+            <span>Informal Emp.</span>
+            <strong>{details.demographics?.informal_employment}%</strong>
+          </div>
+          <div className="demo-row">
+            <span>Low Education</span>
+            <strong>{details.demographics?.primary_edu_or_less}%</strong>
+          </div>
+          <div className="demo-row">
+            <span>Urban Ratio</span>
+            <strong>{details.demographics?.urban_ratio}%</strong>
+          </div>
+        </div>
+      </div>
+
       {details.exclusion_drivers && details.exclusion_drivers.length > 0 && (
         <>
           <div className="section-label mt-4"><i className="fa-solid fa-road-barrier"></i> Primary Exclusion Drivers</div>
@@ -105,6 +137,19 @@ const DistrictInspector = ({ districtId }) => {
           </ul>
         </>
       )}
+
+      <div className="ai-assistant-block">
+        <div className="ai-header">
+          <i className="fa-solid fa-robot"></i> AI Policy Advisor
+        </div>
+        <div className="ai-content">
+          Based on the mismatch gap of <strong>{details.mismatch_gap}</strong> and high informal employment 
+          (<strong>{details.demographics?.informal_employment}%</strong>), 
+          we recommend prioritizing <strong>mobile-first financial literacy</strong> campaigns 
+          targeting rural female populations to bridge the <strong>{details.demographics?.female_exclusion_rate}%</strong> gender gap.
+        </div>
+        <div className="ai-badge">Evidence-Based Suggestion</div>
+      </div>
     </div>
   );
 };

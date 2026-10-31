@@ -1,6 +1,6 @@
 import React from 'react';
 
-const Header = ({ activeTab, setActiveTab }) => {
+const Header = ({ activeTab, setActiveTab, onSearch }) => {
   return (
     <header className="app-header">
       <div className="header-inner">
@@ -14,10 +14,20 @@ const Header = ({ activeTab, setActiveTab }) => {
           </div>
         </div>
         
-        <div className="header-badges">
-          <span className="badge badge-track"><i className="fa-solid fa-trophy"></i> NISR Track 2</span>
-          <span className="badge badge-data"><i className="fa-solid fa-database"></i> EICV7 + FinScope 2024</span>
-          <span className="badge badge-live pulse"><i className="fa-solid fa-circle-dot"></i> Live Data Mode</span>
+        <div className="header-right">
+          <div className="header-search">
+            <i className="fa-solid fa-magnifying-glass"></i>
+            <input 
+              type="text" 
+              placeholder="Search district (e.g. Rutsiro)..." 
+              onChange={(e) => onSearch(e.target.value)}
+            />
+          </div>
+          <div className="header-badges">
+            <span className="badge badge-track"><i className="fa-solid fa-trophy"></i> NISR Track 2</span>
+            <span className="badge badge-data"><i className="fa-solid fa-database"></i> EICV7 + FinScope 2024</span>
+            <span className="badge badge-live pulse"><i className="fa-solid fa-circle-dot"></i> Live Data Mode</span>
+          </div>
         </div>
       </div>
 
