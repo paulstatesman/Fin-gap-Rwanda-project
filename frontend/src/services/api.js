@@ -1,5 +1,6 @@
 // frontend/src/services/api.js
 import axios from 'axios';
+import LOCAL_DISTRICTS from './localDistricts.json';
 
 const API_BASE = (
   process.env.REACT_APP_API_URL || 'https://fin-gap-rwanda-project.onrender.com'
@@ -21,14 +22,68 @@ export const fetchDistricts = (params = {}) =>
 export const fetchDistrict = (id) =>
   api.get(`/api/districts/${id}`).then(r => r.data.data);
 
-export const runSimulation = (payload) =>
-  api.post('/api/simulate', payload).then(r => r.data);
+export const runSimulation = async (payload) => {
+  try {
+    const res = await api.post('/api/simulate', payload);
+    return res.data;
+  } catch (err) {
+    console.warn('API unreachable, computing local simulation:', err.message);
+    const districtId = parseInt(payload.district_id, 10);
+    const district = LOCAL_DISTRICTS.find(d => Number(d.id) === districtId) || LOCAL_DISTRICTS[0];
+
+    const phoneBoost = parseFloat(payload.phone_boost) || 0;
+    const agentBoost = parseFloat(payload.agent_boost) || 0;
+    const literacyBoost = parseFloat(payload.literacy_boost) || 0;
+
+    // Simulation model weights
+    const weightPhone = 0.45;     // 45% mobile penetration weight
+    const weightAgent = 0.35;     // 35% agent network density weight
+    const weightLiteracy = 0.20;  // 20% financial literacy weight
+
+    // Dynamic calculations
+    const totalRiskReduction = (phoneBoost * weightPhone) + (agentBoost * weightAgent) + (literacyBoost * weightLiteracy);
+    const simulatedRiskScore = Math.max(5.0, Number((district.exclusion_risk_score - totalRiskReduction).toFixed(2)));
+    const simulatedExcludedRate = Math.max(2.0, Number((district.fully_excluded_rate - (totalRiskReduction * 0.40)).toFixed(2)));
+    const simulatedMismatchGap = Number((simulatedExcludedRate - (district.poverty_rate * 0.45)).toFixed(2));
+    const exclusionReduction = Number((district.fully_excluded_rate - simulatedExcludedRate).toFixed(2));
+    const estimatedBeneficiaries = Math.round((exclusionReduction / 100) * 200000);
+
+    return {
+      success: true,
+      isFallback: true,
+      district: {
+        id: district.id,
+        name: district.district || district.name,
+        province: district.province
+      },
+      baseline: {
+        exclusion_risk_score: Number(district.exclusion_risk_score),
+        fully_excluded_rate: Number(district.fully_excluded_rate),
+        mismatch_gap: Number(district.mismatch_gap)
+      },
+      interventions: {
+        phone_penetration_boost: phoneBoost,
+        agent_network_boost: agentBoost,
+        financial_literacy_boost: literacyBoost,
+        total_risk_reduction: Number(totalRiskReduction.toFixed(2))
+      },
+      simulated: {
+        exclusion_risk_score: simulatedRiskScore,
+        fully_excluded_rate: simulatedExcludedRate,
+        mismatch_gap: simulatedMismatchGap,
+        risk_score_reduction: Number((district.exclusion_risk_score - simulatedRiskScore).toFixed(2)),
+        exclusion_rate_reduction: exclusionReduction,
+        estimated_beneficiaries: estimatedBeneficiaries
+      }
+    };
+  }
+};
 
 export const fetchModel = () =>
   api.get('/api/model').then(r => r.data.data);
 
 /**
- * generatePolicyReport — calls the Gemini API directly from the browser
+ * generatePolicyReport â€” calls the Gemini API directly from the browser
  * to produce a localized policy brief for local government leaders.
  *
  * Falls back to a deterministic template when no API key is configured
@@ -41,7 +96,7 @@ export const fetchModel = () =>
 export const generatePolicyReport = async (district, allDistricts = []) => {
   const apiKey = process.env.REACT_APP_GEMINI_API_KEY;
 
-  // ── National context helpers ─────────────────────────────────────────────
+  // â”€â”€ National context helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   const sorted = [...allDistricts].sort((a, b) => b.mismatch_gap - a.mismatch_gap);
   const nationalAvgExclusion = allDistricts.length
     ? (allDistricts.reduce((s, d) => s + parseFloat(d.fully_excluded_rate || 0), 0) / allDistricts.length).toFixed(1)
@@ -51,21 +106,21 @@ export const generatePolicyReport = async (district, allDistricts = []) => {
     : 'N/A';
   const districtRank = sorted.findIndex(d => d.id === district.id) + 1;
 
-  // ── Gap category and intervention tier ───────────────────────────────────
+  // â”€â”€ Gap category and intervention tier â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   const gap = parseFloat(district.mismatch_gap);
   let gapCategory, interventionTier;
   if (gap > 10) {
     gapCategory = 'Severely Underserved';
-    interventionTier = 'Priority Tier 1 — Infrastructure & Access';
+    interventionTier = 'Priority Tier 1 â€” Infrastructure & Access';
   } else if (gap > 0) {
     gapCategory = 'Moderately Underserved';
-    interventionTier = 'Priority Tier 2 — Inclusion & Uptake';
+    interventionTier = 'Priority Tier 2 â€” Inclusion & Uptake';
   } else {
     gapCategory = 'Well-Served / Over-performing';
-    interventionTier = 'Priority Tier 3 — Depth & Quality of Services';
+    interventionTier = 'Priority Tier 3 â€” Depth & Quality of Services';
   }
 
-  // ── Deterministic fallback template (always works, no API needed) ─────────
+  // â”€â”€ Deterministic fallback template (always works, no API needed) â”€â”€â”€â”€â”€â”€â”€â”€â”€
   const buildFallbackReport = () => {
     const recsByGap =
       gap > 10
@@ -93,10 +148,10 @@ export const generatePolicyReport = async (district, allDistricts = []) => {
         ? district.exclusion_drivers
         : ['Distance to nearest financial agent', 'Low digital literacy', 'High informal employment rate'];
 
-    return `## Executive Policy Brief — ${district.district} District
+    return `## Executive Policy Brief â€” ${district.district} District
 
-**Prepared for:** Local Government Leadership � ${district.district} District
-**Reference Framework:** NST2 · National Financial Inclusion Strategy 2026
+**Prepared for:** Local Government Leadership — ${district.district} District
+**Reference Framework:** NST2 Â· National Financial Inclusion Strategy 2026
 **Date:** ${new Date().toLocaleDateString('en-RW', { year: 'numeric', month: 'long', day: 'numeric' })}
 **Classification:** For Official Use
 
@@ -109,19 +164,19 @@ ${district.district} is located in **${district.province}** and ranks **#${distr
 | Metric | ${district.district} | National Avg |
 |---|---|---|
 | Financial Exclusion Rate | **${district.fully_excluded_rate}%** | ${nationalAvgExclusion}% |
-| Mobile Money Penetration | **${district.mobile_money_rate}%** | — |
-| Formal Banking Rate | **${district.banked_rate}%** | — |
-| Informal-Only (Ikimina) | **${district.informal_only_rate}%** | — |
+| Mobile Money Penetration | **${district.mobile_money_rate}%** | â€” |
+| Formal Banking Rate | **${district.banked_rate}%** | â€” |
+| Informal-Only (Ikimina) | **${district.informal_only_rate}%** | â€” |
 | Poverty Rate | **${district.poverty_rate}%** | ${nationalAvgPoverty}% |
-| Exclusion Risk Score | **${district.exclusion_risk_score}/100** | — |
+| Exclusion Risk Score | **${district.exclusion_risk_score}/100** | â€” |
 
 ---
 
 ### 2. Mismatch Gap Analysis
 
-**Gap Score: ${gap > 0 ? '+' : ''}${district.mismatch_gap}** — *${gapCategory}*
+**Gap Score: ${gap > 0 ? '+' : ''}${district.mismatch_gap}** â€” *${gapCategory}*
 
-The Mismatch Gap measures how much worse (or better) financial exclusion is in ${district.district} compared to what its poverty level alone would predict. A positive gap signals **structural barriers beyond income poverty** — such as limited agent networks, connectivity deficits, or gender-based exclusion — that require targeted policy action independent of economic growth.
+The Mismatch Gap measures how much worse (or better) financial exclusion is in ${district.district} compared to what its poverty level alone would predict. A positive gap signals **structural barriers beyond income poverty** â€” such as limited agent networks, connectivity deficits, or gender-based exclusion â€” that require targeted policy action independent of economic growth.
 
 **Intervention Category:** ${interventionTier}
 
@@ -155,17 +210,17 @@ ${recsByGap.map((r, i) => `**${i + 1}.** ${r}`).join('\n\n')}
 
 The District Executive Committee should track the following indicators quarterly via FinScope survey data:
 
-- **Financial exclusion rate reduction:** target −3 percentage points per year
-- **Mobile money penetration:** target ≥ 70% within 24 months
-- **Gender exclusion gap closure:** target ≤ 5 pp difference within 18 months
-- **Agent density:** target ≥ 1 active agent per 500 adults in rural sectors
+- **Financial exclusion rate reduction:** target âˆ’3 percentage points per year
+- **Mobile money penetration:** target â‰¥ 70% within 24 months
+- **Gender exclusion gap closure:** target â‰¤ 5 pp difference within 18 months
+- **Agent density:** target â‰¥ 1 active agent per 500 adults in rural sectors
 
 ---
 
-*Generated by the FIN-GAP RWANDA Mismatch Tool · NISR Big Data Hackathon 2026 · Source data: FinScope Rwanda 2024 / EICV6*`;
+*Generated by the FIN-GAP RWANDA Mismatch Tool Â· NISR Big Data Hackathon 2026 Â· Source data: FinScope Rwanda 2024 / EICV6*`;
   };
 
-  // ── Gemini API path ───────────────────────────────────────────────────────
+  // â”€â”€ Gemini API path â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   if (!apiKey) {
     return buildFallbackReport();
   }
@@ -175,7 +230,7 @@ The District Executive Committee should track the following indicators quarterly
 Using the statistical data below from the FIN-GAP Mismatch Tool, write a concise, authoritative Executive Policy Brief in Markdown format. The brief must:
 1. Be written in English, reference Rwanda's NST2 and MINECOFIN / BNR where relevant.
 2. Include sections: District Snapshot, Mismatch Gap Analysis, Key Structural Barriers, Priority Policy Recommendations, NST2 Strategic Alignment, and Monitoring & Evaluation KPIs.
-3. Be specific to the district's data — avoid generic language.
+3. Be specific to the district's data â€” avoid generic language.
 4. Be suitable for printing as a PDF for a government official.
 
 ## District Data
@@ -193,7 +248,7 @@ Using the statistical data below from the FIN-GAP Mismatch Tool, write a concise
 - National Mismatch Rank: #${districtRank} of ${allDistricts.length || 30}
 - Date: ${new Date().toLocaleDateString('en-RW', { year: 'numeric', month: 'long', day: 'numeric' })}
 
-Keep the brief under 700 words. Use Markdown tables where appropriate. Return only the Markdown document — no extra commentary.`;
+Keep the brief under 700 words. Use Markdown tables where appropriate. Return only the Markdown document â€” no extra commentary.`;
 
   try {
     const response = await axios.post(

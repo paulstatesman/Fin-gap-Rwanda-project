@@ -58,7 +58,7 @@ const Simulator = ({ districts, selectedId, onSelectDistrict }) => {
 
           <div className="slider-box">
             <div className="slider-header">
-              <span>📱 Mobile Phone Penetration Boost</span>
+              <span><i className="fa-solid fa-mobile-screen-button text-cyan"></i> Mobile Phone Penetration Boost</span>
               <span className="slider-val">+{phoneBoost}%</span>
             </div>
             <input type="range" min="0" max="50" step="5" value={phoneBoost} onChange={(e) => setPhoneBoost(parseInt(e.target.value, 10))} />
@@ -67,7 +67,7 @@ const Simulator = ({ districts, selectedId, onSelectDistrict }) => {
 
           <div className="slider-box">
             <div className="slider-header">
-              <span>🏪 Agent Network Density Boost</span>
+              <span><i className="fa-solid fa-store text-emerald"></i> Agent Network Density Boost</span>
               <span className="slider-val">+{agentBoost}%</span>
             </div>
             <input type="range" min="0" max="50" step="5" value={agentBoost} onChange={(e) => setAgentBoost(parseInt(e.target.value, 10))} />
@@ -76,7 +76,7 @@ const Simulator = ({ districts, selectedId, onSelectDistrict }) => {
 
           <div className="slider-box">
             <div className="slider-header">
-              <span>📚 Financial Literacy Coverage Boost</span>
+              <span><i className="fa-solid fa-graduation-cap text-gold"></i> Financial Literacy Coverage Boost</span>
               <span className="slider-val">+{literacyBoost}%</span>
             </div>
             <input type="range" min="0" max="50" step="5" value={literacyBoost} onChange={(e) => setLiteracyBoost(parseInt(e.target.value, 10))} />
@@ -116,12 +116,12 @@ const Simulator = ({ districts, selectedId, onSelectDistrict }) => {
                   <div className="sim-score-item">
                     <span>New Exclusion Rate</span>
                     <h3>{result.simulated.fully_excluded_rate}%</h3>
-                    <small className="text-emerald">↓ dropped by {result.simulated.exclusion_rate_reduction}%</small>
+                    <small className="text-emerald"><i className="fa-solid fa-arrow-trend-down"></i> dropped by {result.simulated.exclusion_rate_reduction}%</small>
                   </div>
                   <div className="sim-score-item">
                     <span>New Risk Score</span>
                     <h3>{result.simulated.exclusion_risk_score}</h3>
-                    <small className="text-emerald">↓ dropped by {result.simulated.risk_score_reduction}</small>
+                    <small className="text-emerald"><i className="fa-solid fa-arrow-trend-down"></i> dropped by {result.simulated.risk_score_reduction}</small>
                   </div>
                 </div>
               </div>
