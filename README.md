@@ -166,7 +166,7 @@ The deployed app is at **<https://fingap-rw.vercel.app>** — no login required.
 | README explaining data, information, and interaction | ✅ Completed (`README.md`) |
 | Full source code | ✅ Completed (`backend/` + `frontend/`) |
 | Deployed, publicly accessible app | ✅ Completed (<https://fingap-rw.vercel.app>) |
-| Video demonstration (`.mp4`, ≤ 3 min) | ✅ Completed (`submission/demo-video.mp4`) |
+| Video demonstration (`.mp4`, ≤ 3 min) | ✅ Completed (`submission/demo-video.mp4` · [YouTube Backup](https://youtu.be/SyjoXdk38tA)) |
 | Data file + link to the data | ✅ Completed (`database/` + `localDistricts.json`) |
 | Student cards / eligibility documents | ✅ Completed (`submission/student-cards/`) |
 | Sample login credentials | N/A — no login required |
