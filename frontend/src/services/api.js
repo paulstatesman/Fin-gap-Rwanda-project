@@ -11,17 +11,17 @@ const api = axios.create({
   timeout: 15000,
 });
 
-// Added /api/ prefix to match backend folder routing
+// Clean API routes matching the backend router
 export const fetchNationalSummary = () =>
-  api.get('/api/national-summary.php').then(r => r.data.data);
+  api.get('/api/national-summary').then(r => r.data.data);
 
 export const fetchDistricts = (params = {}) =>
-  api.get('/api/districts.php', { params }).then(r => r.data);
+  api.get('/api/districts', { params }).then(r => r.data);
 
 export const fetchDistrict = (id) =>
-  api.get(`/api/district-detail.php?id=${id}`).then(r => r.data.data);
+  api.get(`/api/districts/${id}`).then(r => r.data.data);
 
 export const runSimulation = (payload) =>
-  api.post('/api/simulate.php', payload).then(r => r.data);
+  api.post('/api/simulate', payload).then(r => r.data);
 
 export default api;

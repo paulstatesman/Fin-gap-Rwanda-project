@@ -9,14 +9,18 @@ require_once __DIR__ . '/cors.php';
 $requestUri = $_SERVER['REQUEST_URI'];
 $path = parse_url($requestUri, PHP_URL_PATH);
 
-// Strip leading slash and "api" prefix if present
+// Strip leading slash, "api" prefix, and .php extension if present
 $route = trim(preg_replace('#^/?api/?#', '', $path), '/');
+$route = preg_replace('/\.php$/', '', $route);
+// Normalize underscores to hyphens for matching
+$route = str_replace('_', '-', $route);
+
 $method = $_SERVER['REQUEST_METHOD'];
 
 // Route dispatcher
 switch (true) {
 
-    // GET /national-summary or /api/national-summary
+    // GET /national-summary
     case $route === 'national-summary' && $method === 'GET':
         require_once __DIR__ . '/api/national_summary.php';
         break;
