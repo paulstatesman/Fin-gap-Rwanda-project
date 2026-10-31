@@ -7,7 +7,7 @@ import MismatchChart from './components/MismatchChart';
 import Simulator from './components/Simulator';
 import PolicyBrief from './components/PolicyBrief';
 import Methodology from './components/Methodology';
-import RwandaMap from './components/RwandaMap';
+import ExclusionHeatmap from './components/ExclusionHeatmap';
 import { fetchDistricts, fetchNationalSummary } from './services/api';
 
 const App = () => {
@@ -86,12 +86,15 @@ const App = () => {
           {activeTab === 'heatmap' && (
             <div className="dashboard-grid">
               <div className="glass card">
-                <div className="card-header">
-                  <h2><i className="fa-solid fa-map-location-dot"></i> Geographical Exclusion Heatmap</h2>
+                <div className="card-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <h2><i className="fa-solid fa-fire text-red"></i> Geographic Financial Exclusion Heatmap</h2>
+                  <span className="badge-data" style={{ fontSize: '11px', padding: '4px 10px', borderRadius: '999px', background: 'rgba(255,255,255,0.06)' }}>
+                    <i className="fa-solid fa-shield-halved text-teal"></i> Zero-API Ready
+                  </span>
                 </div>
-                <RwandaMap 
-                  districts={districts} 
-                  onSelectDistrict={handleDistrictSelect} 
+                <ExclusionHeatmap
+                  districts={districts}
+                  onSelectDistrict={handleDistrictSelect}
                   selectedId={selectedDistrict}
                   activeFilter={activeFilter}
                   summary={summary}
