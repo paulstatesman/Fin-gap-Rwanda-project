@@ -134,7 +134,7 @@ const App = () => {
           )}
 
           {activeTab === 'policy' && (
-            <PolicyBrief />
+            <PolicyBrief districts={districts} />
           )}
 
           {activeTab === 'methodology' && (

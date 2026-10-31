@@ -849,3 +849,188 @@ img, svg, video, canvas { max-width: 100%; }
   .kpi-banner   { grid-template-columns: minmax(0, 1fr); }
 }
 
+
+/* ============================================================
+   POLICY BRIEF — District Report Generator
+   ============================================================ */
+
+/* ---- Section wrapper ---- */
+.report-generator-section {
+  border-top: 1px solid var(--border-glass);
+  margin-top: 28px;
+  padding-top: 24px;
+}
+
+/* ---- Generator header row ---- */
+.report-gen-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.report-gen-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+/* ---- Badges ---- */
+.report-gen-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  border-radius: var(--radius-pill);
+  font-size: 11px;
+  font-weight: 700;
+  border: 1px solid;
+}
+
+.report-gen-badge.badge-ai {
+  background: rgba(168, 85, 247, 0.12);
+  border-color: rgba(168, 85, 247, 0.35);
+  color: var(--purple);
+}
+
+.report-gen-badge.badge-offline {
+  background: rgba(16, 185, 129, 0.10);
+  border-color: rgba(16, 185, 129, 0.30);
+  color: var(--emerald);
+}
+
+.report-gen-badge.badge-pdf {
+  background: rgba(239, 68, 68, 0.10);
+  border-color: rgba(239, 68, 68, 0.30);
+  color: #fca5a5;
+}
+
+/* ---- Controls row (dropdown + button) ---- */
+.report-gen-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  align-items: flex-end;
+  margin-bottom: 0;
+}
+
+.report-gen-controls .sim-select {
+  flex: 1 1 260px;
+  margin-bottom: 0;
+}
+
+.report-gen-controls .sim-select select {
+  margin-bottom: 0;
+}
+
+/* ---- Output wrapper ---- */
+.report-output-wrapper {
+  margin-top: 22px;
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px solid var(--border-glass);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+/* ---- Output toolbar ---- */
+.report-output-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 18px;
+  background: rgba(0, 0, 0, 0.30);
+  border-bottom: 1px solid var(--border-glass);
+}
+
+/* ---- Rendered brief ---- */
+.report-rendered-brief {
+  padding: 28px 32px;
+  font-size: 13.5px;
+  line-height: 1.8;
+  color: var(--text-secondary);
+  max-height: 72vh;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Markdown elements rendered inside the brief */
+.report-rendered-brief .brief-h2 {
+  font-family: var(--font-heading);
+  font-size: 18px;
+  color: var(--gold);
+  margin: 24px 0 6px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--border-glass);
+}
+
+.report-rendered-brief .brief-h3 {
+  font-family: var(--font-heading);
+  font-size: 14px;
+  color: var(--teal);
+  margin: 18px 0 5px;
+}
+
+.report-rendered-brief .brief-h4 {
+  font-size: 13px;
+  color: var(--cyan);
+  margin: 14px 0 4px;
+}
+
+.report-rendered-brief .brief-p {
+  margin: 5px 0;
+  color: var(--text-secondary);
+}
+
+.report-rendered-brief .brief-hr {
+  border: none;
+  border-top: 1px solid var(--border-glass);
+  margin: 18px 0;
+}
+
+.report-rendered-brief .brief-ul {
+  padding-left: 20px;
+  margin: 6px 0 10px;
+  list-style: disc;
+}
+
+.report-rendered-brief .brief-ul li {
+  margin-bottom: 4px;
+  color: var(--text-secondary);
+}
+
+.report-rendered-brief .brief-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+  margin: 10px 0 18px;
+}
+
+.report-rendered-brief .brief-table th {
+  background: rgba(0, 0, 0, 0.45);
+  color: var(--cyan);
+  font-weight: 700;
+  padding: 9px 11px;
+  text-align: left;
+  border: 1px solid var(--border-glass);
+}
+
+.report-rendered-brief .brief-table td {
+  padding: 8px 11px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  color: var(--text-secondary);
+}
+
+.report-rendered-brief strong { color: var(--text-primary); }
+.report-rendered-brief code   { background: rgba(0,0,0,.45); padding: 2px 6px; border-radius: 4px; color: var(--teal); font-family: monospace; }
+
+/* Responsive: collapse side by side into stack on small screens */
+@media (max-width: 620px) {
+  .report-gen-controls { flex-direction: column; align-items: stretch; }
+  .report-gen-controls .btn { width: 100%; justify-content: center; }
+  .report-rendered-brief { padding: 18px 16px; }
+  .report-output-toolbar { flex-direction: column; align-items: flex-start; }
+}
