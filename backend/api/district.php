@@ -4,8 +4,7 @@
 // Returns full detail for a single district including
 // demographics, exclusion drivers, and policy recommendations
 // ============================================================
-require_once __DIR__ . '/cors.php';
-require_once __DIR__ . '/config/database.php';
+require_once __DIR__ . '/../cors.php';
 require_once __DIR__ . '/../config/database.php';
 
 $pdo = getDBConnection();
